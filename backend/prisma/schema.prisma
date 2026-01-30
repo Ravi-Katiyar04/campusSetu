@@ -33,13 +33,19 @@ model Profile {
 }
 
 model Progress {
-  id     String @id @default(uuid())
-  level  Int
-  xp     Int
-  streak Int
-  userId String @unique
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id           String   @id @default(uuid())
+  userId       String   @unique
+  user         User     @relation(fields: [userId], references: [id])
+
+  level        Int      @default(1)
+  xp           Int      @default(0)
+  streak       Int      @default(0)
+  lastActiveAt DateTime?
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
+
 
 model Company {
   id        String @id @default(uuid())
