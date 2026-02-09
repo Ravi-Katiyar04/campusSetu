@@ -1,7 +1,9 @@
+import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import authRoutes from "./routes/auth.routes";
 import progressRoutes from "./routes/progress.routes";
+import companyRoutes from "./routes/company.routes";
 
 const app = express();
 app.use(cors());
@@ -11,5 +13,6 @@ app.get("/", (_, res) => res.send("GradPath API running"));
 
 app.use("/auth", authRoutes);
 app.use("/progress", progressRoutes);
+app.use("/companies", companyRoutes);
 
 app.listen(5000, () => console.log("Server on 5000"));

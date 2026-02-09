@@ -1,5 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
+  provider = "prisma-client"
+  output   = "../generated/prisma"
 }
 
 datasource db {
@@ -48,10 +49,15 @@ model Progress {
 
 
 model Company {
-  id        String @id @default(uuid())
-  name      String
-  package   String
-  year      Int
-  role      String
-  questions String
+  id            String   @id @default(uuid())
+  name          String
+  role          String
+  packageLPA    Float
+  year          Int
+  location      String?
+  eligibility   String?
+  description   String?
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
