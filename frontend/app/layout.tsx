@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -31,37 +32,8 @@ export default function RootLayout({
       >
         <Navbar/>
         {children}
+        <Footer/>
       </body>
     </html>
   );
 }
-
-// "use client";
-
-// import "./globals.css";
-// import { useState } from "react";
-// import Navbar from "@/components/Navbar";
-// import Sidebar from "@/components/Sidebar";
-
-// export default function RootLayout({
-//   children,
-// }: {
-//   children: React.ReactNode;
-// }) {
-//   const [sidebarOpen, setSidebarOpen] = useState(false);
-
-//   return (
-//     <html lang="en">
-//       <body className="bg-gray-50 dark:bg-gray-950 dark:text-gray-200">
-
-//         <Navbar toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
-
-//         <div className="flex">
-//           <Sidebar open={sidebarOpen} />
-//           <main className="flex-1 p-6">{children}</main>
-//         </div>
-
-//       </body>
-//     </html>
-//   );
-// }
