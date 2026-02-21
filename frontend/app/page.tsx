@@ -176,7 +176,7 @@ export default function Home() {
 
             <Link
               href="/dashboard"
-              className="inline-block mt-8 border border-gray-900 dark:border-gray-200 px-6 py-2 rounded-full font-medium hover:bg-gray-100 dark:hover:bg-gray-800 transition"
+              className="inline-block mt-8 border border-gray-900 dark:border-gray-200 px-6 py-2 rounded-full font-medium hover:bg-blue-100 dark:hover:bg-gray-800 transition"
             >
               Perfect Your Interview Skills →
             </Link>
@@ -194,29 +194,30 @@ export default function Home() {
 
           {/* LEFT CARD */}
           <div className="relative order-2 md:order-1">
-            <div className="absolute -inset-4 bg-blue-100 dark:bg-blue-900/20 rounded-3xl blur-2xl opacity-60"></div>
-            <div className="relative bg-white dark:bg-gray-900 shadow-2xl rounded-3xl p-8 border dark:border-gray-800">
-              
-              <Image src="/assets/resume-builder.png" alt="AI Resume Builder" width={500} height={300} className="rounded-xl shadow-lg" />
+            <div className="absolute -inset-4 bg-blue-100 dark:bg-blue-900/20 rounded-3xl blur-2xl opacity-20"></div>
+            <div className="relative bg-white dark:bg-gray-900 shadow-2xl rounded-3xl dark:border-gray-800">
 
-              <h3 className="text-2xl font-bold mt-6">
-                AI Resume Builder
-              </h3>
+              <Image src="/assets/resume-builder.png" alt="AI Resume Builder" width={600} height={300} className="rounded-xl shadow-lg" />
 
-              <ul className="mt-6 space-y-4 text-gray-700 dark:text-gray-300">
-                <li><strong>Keyword Optimization:</strong> ATS-friendly keyword placement</li>
-                <li><strong>Achievement Quantification:</strong> Measurable accomplishments</li>
-                <li><strong>Professional Formatting:</strong> Industry-standard structure</li>
-                <li><strong>Content Tailoring:</strong> Job-specific customization</li>
-              </ul>
 
-              <Link
-                href="/dashboard"
-                className="inline-block mt-8 border border-gray-900 dark:border-gray-200 px-6 py-2 rounded-full font-medium hover:bg-gray-100 dark:hover:bg-gray-800 transition"
-              >
-                Create Your Perfect Resume →
-              </Link>
             </div>
+            <h3 className="text-2xl font-bold mt-6">
+              AI Resume Builder
+            </h3>
+
+            <ul className="mt-6 space-y-4 text-gray-700 dark:text-gray-300">
+              <li><strong>Keyword Optimization:</strong> ATS-friendly keyword placement</li>
+              <li><strong>Achievement Quantification:</strong> Measurable accomplishments</li>
+              <li><strong>Professional Formatting:</strong> Industry-standard structure</li>
+              <li><strong>Content Tailoring:</strong> Job-specific customization</li>
+            </ul>
+
+            <Link
+              href="/dashboard"
+              className="inline-block mt-8 border border-gray-900 dark:border-gray-200 px-6 py-2 rounded-full font-medium hover:bg-blue-100 dark:hover:bg-gray-800 transition"
+            >
+              Create Your Perfect Resume →
+            </Link>
           </div>
 
           {/* RIGHT CONTENT */}
