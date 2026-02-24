@@ -3,15 +3,23 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useAuth } from "@/lib/useAuth";
+import { useAppSelector, useAppDispatch } from "../lib/hooks";
+import { logout } from "../lib/features/auth/authSlice";
+import Image from "next/image";
 
 export default function Navbar() {
     const pathname = usePathname();
-    const { user, logout } = useAuth();
+    const dispatch = useAppDispatch();
+    const { user } = useAppSelector((state) => state.auth);
 
     const [mobileOpen, setMobileOpen] = useState(false);
     const [profileOpen, setProfileOpen] = useState(false);
     const [dark, setDark] = useState(false);
+
+    const logoutHandler = () => {
+        dispatch(logout());
+        setProfileOpen(false);
+    };
 
     /* ---------------- Dark Mode ---------------- */
 
@@ -66,6 +74,7 @@ export default function Navbar() {
                     </button>
 
                     {/* Logo */}
+                    <Image src="/assets/knit-logo.png" alt="CampusSetu Logo" width={40} height={40}></Image>
                     <Link href="/" className="text-2xl font-bold text-blue-600">
                         CampusSetu
                     </Link>
@@ -124,6 +133,8 @@ export default function Navbar() {
                                     onClick={() => setProfileOpen(!profileOpen)}
                                 />
 
+                                {/* <i className="fas fa-user-circle fa-2x"></i> */}
+
                                 {profileOpen && (
                                     <div className="absolute right-0 mt-3 w-52 bg-white dark:bg-gray-800 shadow-lg rounded-lg py-2 text-sm">
 
@@ -153,7 +164,7 @@ export default function Navbar() {
                                         )}
 
                                         <button
-                                            onClick={logout}
+                                            onClick={logoutHandler}
                                             className="w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700"
                                         >
                                             <i className="fa-solid fa-right-from-bracket mr-2"></i>
@@ -166,7 +177,7 @@ export default function Navbar() {
                     ) : (
                         <Link
                             href="/login"
-                            className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition"
+                            className="bg-blue-600 cursor-pointer text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition"
                         >
                             Login
                         </Link>
@@ -201,7 +212,7 @@ export default function Navbar() {
 
                     {user ? (
                         <button
-                            onClick={logout}
+                            onClick={logoutHandler}
                             className="block text-left text-red-500"
                         >
                             Logout

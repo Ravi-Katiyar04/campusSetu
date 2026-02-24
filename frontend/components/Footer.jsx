@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 
 export default function Footer() {
   return (
@@ -12,9 +13,7 @@ export default function Footer() {
 
           {/* Logo */}
           <div className="flex items-center gap-3">
-            <div className="text-3xl text-blue-600">
-              <i className="fa-solid fa-graduation-cap"></i>
-            </div>
+            <Image src="/assets/knit-logo.png" alt="CampusSetu Logo" width={40} height={40}></Image>
             <span className="text-lg font-semibold tracking-wide">
               CampusSetu
             </span>

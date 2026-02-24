@@ -1,6 +1,5 @@
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
@@ -60,4 +59,11 @@ model Company {
 
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+}
+
+model StudentRegistry {
+  id         Int     @id @default(autoincrement())
+  rollNumber String  @unique
+  email      String  @unique
+  name       String
 }

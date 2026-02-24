@@ -8,43 +8,77 @@ export class AuthController {
   // POST /auth/register
   static async register(req: Request, res: Response) {
     try {
-      const { name, email, password, role } = req.body;
+      const { name, email, password, rollNumber } = req.body;
 
-      if (!name || !email || !password) {
+      // 1️⃣ Validate required fields
+      if (!name || !email || !password || !rollNumber) {
         return res.status(400).json({ message: "All fields required" });
       }
 
+      // 2️⃣ Validate official college email domain
+      const allowedDomain = "knit.ac.in"; // college  email domain
+      const emailDomain = email.split("@")[1];
+
+      if (emailDomain !== allowedDomain) {
+        return res.status(403).json({
+          message: "Use your official college email"
+        });
+      }
+
+      // 3️⃣ Check if student exists in college registry
+      const student = await prisma.studentRegistry.findFirst({
+        where: {
+          email,
+          rollNumber,
+        },
+      });
+
+      if (!student) {
+        return res.status(403).json({
+          message: "You are not an authorized college student"
+        });
+      }
+
+      // 4️⃣ Check if already registered
       const existingUser = await prisma.user.findUnique({
         where: { email },
       });
 
       if (existingUser) {
-        return res.status(400).json({ message: "User already exists" });
+        return res.status(400).json({
+          message: "User already registered"
+        });
       }
 
+      // 5️⃣ Hash password
       const hashedPassword = await bcrypt.hash(password, 10);
 
+      // 6️⃣ Create user
       const user = await prisma.user.create({
         data: {
           name,
           email,
           password: hashedPassword,
-          role: role || "STUDENT",
+          role: "STUDENT", // Never trust frontend role
         },
       });
 
+      // 7️⃣ Generate JWT
       const token = signToken({
         id: user.id,
         email: user.email,
         role: user.role,
       });
 
-      res.status(201).json({
+      return res.status(201).json({
         message: "User registered successfully",
         token,
       });
-    } catch (err) {
-      res.status(500).json({ message: "Registration failed", error: err });
+
+    } catch (error) {
+      return res.status(500).json({
+        message: "Registration failed"
+      });
     }
   }
 
@@ -75,6 +109,12 @@ export class AuthController {
 
       res.json({
         message: "Login successful",
+        user: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+        },
         token,
       });
     } catch (err) {
