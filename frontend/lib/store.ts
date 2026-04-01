@@ -1,12 +1,14 @@
-  import { configureStore } from '@reduxjs/toolkit'
-  import authReducer from './features/auth/authSlice'
+import { configureStore } from '@reduxjs/toolkit'
+import authReducer from './features/auth/authSlice'
 
+const rootReducer = {
+  auth: authReducer,
+}
 
-export const makeStore = () => {
+export const makeStore = (preloadedState?: Partial<ReturnType<typeof configureStore<typeof rootReducer>>['getState']>) => {
   return configureStore({
-    reducer: {
-      auth: authReducer,
-    },
+    reducer: rootReducer,
+    preloadedState,
   })
 }
 

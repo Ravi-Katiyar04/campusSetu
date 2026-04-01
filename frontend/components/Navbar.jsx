@@ -12,15 +12,22 @@ export default function Navbar() {
     const dispatch = useAppDispatch();
     const { user } = useAppSelector((state) => state.auth);
 
+
     const [mobileOpen, setMobileOpen] = useState(false);
     const [profileOpen, setProfileOpen] = useState(false);
     const [dark, setDark] = useState(false);
 
-    const logoutHandler = () => {
-        dispatch(logout());
-        setProfileOpen(false);
-    };
 
+
+
+    const logoutHandler = async () => {
+        await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/logout`, {
+            method: "POST",
+            credentials: "include",
+        });
+
+        dispatch(logout());
+    };
     /* ---------------- Dark Mode ---------------- */
 
     useEffect(() => {
@@ -124,16 +131,18 @@ export default function Navbar() {
                                 </span>
                             </button>
 
+
+
                             {/* Profile Dropdown */}
                             <div className="relative">
-                                <img
+                                {/* <img
                                     src={user.avatar}
                                     alt="avatar"
                                     className="w-9 h-9 rounded-full cursor-pointer border"
                                     onClick={() => setProfileOpen(!profileOpen)}
-                                />
+                                /> */}
 
-                                {/* <i className="fas fa-user-circle fa-2x"></i> */}
+                                <i className="fas fa-user-circle fa-2x" onClick={() => setProfileOpen(!profileOpen)}></i>
 
                                 {profileOpen && (
                                     <div className="absolute right-0 mt-3 w-52 bg-white dark:bg-gray-800 shadow-lg rounded-lg py-2 text-sm">

@@ -1,12 +1,19 @@
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 import authRoutes from "./routes/auth.routes";
 import progressRoutes from "./routes/progress.routes";
 import companyRoutes from "./routes/company.routes";
 
 const app = express();
-app.use(cors());
+app.use(cookieParser());
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+  })
+);
 app.use(express.json());
 
 app.get("/", (_, res) => res.send("GradPath API running"));

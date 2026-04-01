@@ -16,37 +16,12 @@ interface AuthState {
   successMessage: string | null;
 }
 
-const getStoredUser = (): User | null => {
-  if (typeof window === "undefined") {
-    return null; // SSR guard
-  }
-
-  const raw = localStorage.getItem("user");
-
-  // If nothing stored or accidentally stored as "undefined", bail out
-  if (!raw || raw === "undefined" || raw === "null") {
-    return null;
-  }
-
-  try {
-    return JSON.parse(raw) as User;
-  } catch (error) {
-    console.error("Failed to parse stored user:", error);
-    return null;
-  }
-};
 
 
-const getStoredToken = (): string | null => {
-  if (typeof window !== "undefined") {
-    return localStorage.getItem("token");
-  }
-  return null;
-};
 
 const initialState: AuthState = {
-  user: getStoredUser(),
-  token: getStoredToken(),
+  user: null,
+  token: null,
   registerLoading: false,
   successMessage: null,
   loading: false,
@@ -84,7 +59,7 @@ export const registerUser = createAsyncThunk<
 
 
 export const loginUser = createAsyncThunk<
-  { user: User; token: string }, // Return type
+  { user: User }, // Return type
   { email: string; password: string }, // Argument type
   { rejectValue: string } // Error type
 >(
@@ -93,6 +68,7 @@ export const loginUser = createAsyncThunk<
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
         method: "POST",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
@@ -104,11 +80,7 @@ export const loginUser = createAsyncThunk<
       if (!res.ok) {
         return rejectWithValue(data.message);
       }
-
-      console.log("Login successful, received data:", data);
-
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
+      
 
       return data;
     } catch (error) {
@@ -125,10 +97,6 @@ const authSlice = createSlice({
       state.user = null;
       state.token = null;
 
-      if (typeof window !== "undefined") {
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
-      }
     },
   },
   extraReducers: (builder) => {
@@ -139,10 +107,9 @@ const authSlice = createSlice({
       })
       .addCase(
         loginUser.fulfilled,
-        (state, action: PayloadAction<{ user: User; token: string }>) => {
+        (state, action: PayloadAction<{ user: User }>) => {
           state.loading = false;
           state.user = action.payload.user;
-          state.token = action.payload.token;
         }
       )
       .addCase(loginUser.rejected, (state, action) => {

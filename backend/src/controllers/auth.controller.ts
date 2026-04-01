@@ -107,6 +107,13 @@ export class AuthController {
         role: user.role,
       });
 
+      res.cookie("token", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      });
+
       res.json({
         message: "Login successful",
         user: {
@@ -115,11 +122,16 @@ export class AuthController {
           email: user.email,
           role: user.role,
         },
-        token,
       });
     } catch (err) {
       res.status(500).json({ message: "Login failed", error: err });
     }
+  }
+
+  // POST /auth/logout
+  static async logout(req: Request, res: Response) {
+    res.clearCookie("token");
+    res.json({ message: "Logged out" });
   }
 
   // GET /me
