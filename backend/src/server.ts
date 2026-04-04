@@ -5,6 +5,7 @@ import cookieParser from "cookie-parser";
 import authRoutes from "./routes/auth.routes";
 import progressRoutes from "./routes/progress.routes";
 import companyRoutes from "./routes/company.routes";
+import profileRoutes from "./routes/profile.routes";
 
 const app = express();
 app.use(cookieParser());
@@ -21,5 +22,6 @@ app.get("/", (_, res) => res.send("GradPath API running"));
 app.use("/auth", authRoutes);
 app.use("/progress", progressRoutes);
 app.use("/companies", companyRoutes);
+app.use("/profile", profileRoutes);
 
 app.listen(5000, () => console.log("Server on 5000"));

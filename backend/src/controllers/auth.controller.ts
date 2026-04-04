@@ -63,16 +63,19 @@ export class AuthController {
         },
       });
 
-      // 7️⃣ Generate JWT
-      const token = signToken({
-        id: user.id,
-        email: user.email,
-        role: user.role,
+      // ✅ CREATE PROFILE AUTOMATICALLY
+      await prisma.profile.create({
+        data: {
+          userId: user.id,
+          college: "KNIT Sultanpur", // default or from registry
+          year: null,
+          course: null,
+          skills: [],
+        },
       });
 
       return res.status(201).json({
         message: "User registered successfully",
-        token,
       });
 
     } catch (error) {
@@ -110,18 +113,12 @@ export class AuthController {
       res.cookie("token", token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
+        sameSite: "lax",
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
       });
 
       res.json({
         message: "Login successful",
-        user: {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
-        },
       });
     } catch (err) {
       res.status(500).json({ message: "Login failed", error: err });
@@ -133,22 +130,38 @@ export class AuthController {
     res.clearCookie("token");
     res.json({ message: "Logged out" });
   }
-
+  
   // GET /me
   static async me(req: AuthRequest, res: Response) {
-    const userId = req.user.id;
+    try {
+      const userId = req.user.id;
 
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        role: true,
-        createdAt: true,
-      },
-    });
+      const userWithProfile = await prisma.user.findUnique({
+        where: { id: userId },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          role: true,
+          profile: {
+            select: {
+              college: true,
+              course: true,
+              year: true,
+              skills: true,
+            },
+          },
+        },
+      });
 
-    res.json(user);
+      if (!userWithProfile) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      res.json(userWithProfile);
+    } catch (error) {
+      console.error("ME ERROR:", error);
+      res.status(500).json({ message: "Failed to fetch user" });
+    }
   }
 }

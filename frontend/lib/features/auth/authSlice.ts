@@ -4,28 +4,29 @@ interface User {
   id: string;
   name: string;
   email: string;
-  role: "admin" | "student";
+  role: string;
+  profile: {
+    college: string | null;
+    course: string | null;
+    year: number | null;
+    skills: string[];
+  } | null;
 }
 
 interface AuthState {
   user: User | null;
-  token: string | null;
   loading: boolean;
   registerLoading: boolean;
   error: string | null;
   successMessage: string | null;
 }
 
-
-
-
 const initialState: AuthState = {
   user: null,
-  token: null,
-  registerLoading: false,
-  successMessage: null,
   loading: false,
+  registerLoading: false,
   error: null,
+  successMessage: null,
 };
 
 // 🔥 Async Thunk (Typed)
@@ -59,12 +60,12 @@ export const registerUser = createAsyncThunk<
 
 
 export const loginUser = createAsyncThunk<
-  { user: User }, // Return type
+  void, // Return type
   { email: string; password: string }, // Argument type
   { rejectValue: string } // Error type
 >(
   "auth/loginUser",
-  async (userData, { rejectWithValue }) => {
+  async (userData, { rejectWithValue, dispatch }) => {
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
         method: "POST",
@@ -80,14 +81,33 @@ export const loginUser = createAsyncThunk<
       if (!res.ok) {
         return rejectWithValue(data.message);
       }
-      
+      await dispatch(fetchMe());
 
-      return data;
     } catch (error) {
       return rejectWithValue("Something went wrong");
     }
   }
 );
+
+export const fetchMe = createAsyncThunk<
+  User,
+  void,
+  { rejectValue: string }
+>("auth/fetchMe", async (_, { rejectWithValue }) => {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/me`, {
+      credentials: "include",
+    });
+
+    if (!res.ok) {
+      return rejectWithValue("Failed to fetch user");
+    }
+
+    return await res.json();
+  } catch {
+    return rejectWithValue("Failed to fetch user");
+  }
+});
 
 const authSlice = createSlice({
   name: "auth",
@@ -95,27 +115,25 @@ const authSlice = createSlice({
   reducers: {
     logout: (state) => {
       state.user = null;
-      state.token = null;
-
     },
   },
   extraReducers: (builder) => {
     builder
+
+      // LOGIN
       .addCase(loginUser.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(
-        loginUser.fulfilled,
-        (state, action: PayloadAction<{ user: User }>) => {
-          state.loading = false;
-          state.user = action.payload.user;
-        }
-      )
+      .addCase(loginUser.fulfilled, (state) => {
+        state.loading = false;
+      })
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload ?? "Login failed";
       })
+
+      // REGISTER
       .addCase(registerUser.pending, (state) => {
         state.registerLoading = true;
         state.error = null;
@@ -128,6 +146,19 @@ const authSlice = createSlice({
       .addCase(registerUser.rejected, (state, action) => {
         state.registerLoading = false;
         state.error = action.payload ?? "Registration failed";
+      })
+
+      // FETCH ME
+      .addCase(fetchMe.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchMe.fulfilled, (state, action: PayloadAction<User>) => {
+        state.loading = false;
+        state.user = action.payload;
+      })
+      .addCase(fetchMe.rejected, (state) => {
+        state.loading = false;
+        state.user = null;
       });
   },
 });
