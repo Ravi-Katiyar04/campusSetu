@@ -28,20 +28,55 @@ export class CompanyController {
 
 
     // STUDENT — View + Filter
+    // controllers/companyController.ts
+
     static async list(req: Request, res: Response) {
-        const { year, role } = req.query;
+        try {
+            const { year, role, package: pkg, search, page, limit } = req.query;
 
-        const filters: any = {};
+            const filters: any = {};
 
-        if (year) filters.year = Number(year as string);
+            // YEAR
+            if (year) {
+                filters.year = Number(year as string);
+            }
 
-        if (role) filters.role = {
-            contains: role as string,
-            mode: "insensitive",
-        };
+            // ROLE (case-insensitive)
+            if (role) {
+                filters.role = {
+                    contains: role as string,
+                    mode: "insensitive",
+                };
+            }
 
+            // SEARCH (company name)
+            if (search) {
+                filters.name = {
+                    contains: search as string,
+                    mode: "insensitive",
+                };
+            }
 
-        const companies = await CompanyService.list(filters);
-        res.json(companies);
+            // PACKAGE FILTER
+            if (pkg) {
+                const value = pkg as string;
+
+                if (value === "5+") filters.packageOffered = { gte: 5 };
+                if (value === "10+") filters.packageOffered = { gte: 10 };
+                if (value === "15+") filters.packageOffered = { gte: 15 };
+                if (value === "20+") filters.packageOffered = { gte: 20 };
+            }
+
+            // PAGINATION
+            const pageNum = Number(page) || 1;
+            const limitNum = Number(limit) || 10;
+            const skip = (pageNum - 1) * limitNum;
+
+            const companies = await CompanyService.list(filters, skip, limitNum);
+
+            res.json(companies);
+        } catch (error) {
+            res.status(500).json({ message: "Failed to fetch companies", error });
+        }
     }
 }

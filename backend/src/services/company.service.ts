@@ -18,10 +18,17 @@ export class CompanyService {
     });
   }
 
-  static list(filters: any) {
+  // services/companyService.ts
+
+  static list(filters: any, skip = 0, take = 10) {
     return prisma.company.findMany({
       where: filters,
-      orderBy: { year: "desc" },
+      orderBy: [
+        { packageOffered: "desc" }, // primary sorting
+        { year: "desc" },           // secondary sorting
+      ],
+      skip,
+      take,
     });
   }
 }

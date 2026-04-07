@@ -51,11 +51,13 @@ model Company {
   id            String   @id @default(uuid())
   name          String
   role          String
-  packageLPA    Float
+  packageOffered    Float
+  questionsAsked String[]
+  studentsPlaced Int
   year          Int
-  location      String?
   eligibility   String?
   description   String?
+  experience    String?
 
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
