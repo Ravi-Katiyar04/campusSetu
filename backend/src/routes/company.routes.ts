@@ -10,6 +10,7 @@ router.get("/", authMiddleware, CompanyController.list);
 
 // ADMIN — manage
 router.post("/", authMiddleware, adminOnly, CompanyController.create);
+router.get("/:id", authMiddleware, CompanyController.getById);
 router.put("/:id", authMiddleware, adminOnly, CompanyController.update);
 router.delete("/:id", authMiddleware, adminOnly, CompanyController.remove);
 
