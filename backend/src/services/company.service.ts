@@ -18,6 +18,12 @@ export class CompanyService {
     });
   }
 
+  static getById(id: string) {
+    return prisma.company.findUnique({
+      where: { id },
+    });
+  }
+
   // services/companyService.ts
 
   static list(filters: any, skip = 0, take = 10) {

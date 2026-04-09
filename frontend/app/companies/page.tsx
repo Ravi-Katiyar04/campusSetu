@@ -1,10 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function CompaniesPage() {
   const [companies, setCompanies] = useState([]);
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
+
 
   const [filters, setFilters] = useState({
     year: "",
@@ -149,7 +152,9 @@ export default function CompaniesPage() {
                 Eligibility: {company.eligibility}
               </span>
 
-              <button className="text-blue-600 cursor-pointer text-sm hover:underline">
+              <button 
+              onClick={() => router.push(`/companies/${company.id}`)}
+              className="text-blue-600 cursor-pointer text-sm hover:underline">
                 View Details →
               </button>
             </div>

@@ -26,9 +26,20 @@ export class CompanyController {
         res.json({ message: "Company deleted" });
     }
 
+    static async getById(req: Request<IdParam>, res: Response) {
+        try {
+            const company = await CompanyService.getById(req.params.id);    
+            if (!company) {
+                return res.status(404).json({ message: "Company not found" });
+            }
+            res.json(company);
+        } catch (error) {
+            res.status(500).json({ message: "Failed to fetch company", error });
+        }
+    }
+
 
     // STUDENT — View + Filter
-    // controllers/companyController.ts
 
     static async list(req: Request, res: Response) {
         try {
