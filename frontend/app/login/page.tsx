@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import { loginUser } from "@/lib/features/auth/authSlice";
 import { useRouter } from "next/navigation";
+import { fetchMe } from "@/lib/features/auth/authSlice";
 import Image from "next/image";
 
 export default function LoginPage() {
@@ -24,11 +25,18 @@ export default function LoginPage() {
         loginUser({
           email: studentId,
           password,
+          accountType,
         })
       );
 
       if (loginUser.fulfilled.match(resultAction)) {
-        router.push("/"); // redirect to home
+        const user = await dispatch(fetchMe()).unwrap();
+
+        if (user.role === "ADMIN") {
+          router.push("/admin");
+        } else {
+          router.push("/student");
+        }
       } else {
         console.log("Login failed:", resultAction.payload);
       }

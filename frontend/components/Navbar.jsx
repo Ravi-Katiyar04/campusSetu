@@ -1,15 +1,18 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAppSelector, useAppDispatch } from "../lib/hooks";
 import { logout } from "../lib/features/auth/authSlice";
+
 import Image from "next/image";
 
 export default function Navbar() {
     const pathname = usePathname();
     const dispatch = useAppDispatch();
+    const router = useRouter();
     const { user } = useAppSelector((state) => state.auth);
 
 
@@ -27,6 +30,7 @@ export default function Navbar() {
         });
 
         dispatch(logout());
+        router.push("/");
     };
     /* ---------------- Dark Mode ---------------- */
 

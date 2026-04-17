@@ -61,7 +61,7 @@ export const registerUser = createAsyncThunk<
 
 export const loginUser = createAsyncThunk<
   void, // Return type
-  { email: string; password: string }, // Argument type
+  { email: string; password: string; accountType: string }, // Argument type
   { rejectValue: string } // Error type
 >(
   "auth/loginUser",
