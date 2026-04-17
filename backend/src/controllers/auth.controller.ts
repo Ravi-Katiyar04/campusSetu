@@ -10,12 +10,12 @@ export class AuthController {
     try {
       const { name, email, password, rollNumber } = req.body;
 
-      // Validate required fields
+      // 1️⃣ Validate required fields
       if (!name || !email || !password || !rollNumber) {
         return res.status(400).json({ message: "All fields required" });
       }
 
-      //  Validate official college email domain
+      // 2️⃣ Validate official college email domain
       const allowedDomain = "knit.ac.in"; // college  email domain
       const emailDomain = email.split("@")[1];
 
@@ -25,7 +25,7 @@ export class AuthController {
         });
       }
 
-      // Check if student exists in college registry
+      // 3️⃣ Check if student exists in college registry
       const student = await prisma.studentRegistry.findFirst({
         where: {
           email,
@@ -39,7 +39,7 @@ export class AuthController {
         });
       }
 
-      // Check if already registered
+      // 4️⃣ Check if already registered
       const existingUser = await prisma.user.findUnique({
         where: { email },
       });
@@ -50,10 +50,10 @@ export class AuthController {
         });
       }
 
-      // Hash password
+      // 5️⃣ Hash password
       const hashedPassword = await bcrypt.hash(password, 10);
 
-      // Create user
+      // 6️⃣ Create user
       const user = await prisma.user.create({
         data: {
           name,
@@ -63,7 +63,7 @@ export class AuthController {
         },
       });
 
-      //  CREATE PROFILE AUTOMATICALLY
+      // ✅ CREATE PROFILE AUTOMATICALLY
       await prisma.profile.create({
         data: {
           userId: user.id,
@@ -88,50 +88,8 @@ export class AuthController {
   // POST /auth/login
   static async login(req: Request, res: Response) {
     try {
-      const { email, password, accountType } = req.body;
+      const { email, password } = req.body;
 
-      // ADMIN LOGIN
-      if (accountType === "admin") {
-        const admin = await prisma.admin.findUnique({
-          where: { email },
-        });
-
-
-
-        if (!admin) {
-          return res.status(400).json({ message: "Invalid credentials" });
-        }
-
-        const isMatch = password === admin.password;
-        // const isMatch = await bcrypt.compare(password, admin.password);
-
-        if (!isMatch) {
-          return res.status(400).json({ message: "Invalid credentials" });
-        }
-
-        const token = signToken({
-          id: admin.id,
-          email: admin.email,
-          role: "ADMIN",
-        });
-
-        res.cookie("token", token, {
-          httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "lax",
-          maxAge: 7 * 24 * 60 * 60 * 1000,
-        });
-
-        // IMPORTANT: store role separately
-        res.cookie("role", "ADMIN");
-
-        return res.json({
-          message: "Admin login successful",
-          role: "ADMIN",
-        });
-      }
-
-      // STUDENT LOGIN (DEFAULT)
       const user = await prisma.user.findUnique({
         where: { email },
       });
@@ -156,16 +114,12 @@ export class AuthController {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "lax",
-        maxAge: 7 * 24 * 60 * 60 * 1000,
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
       });
 
-      res.cookie("role", user.role);
-
-      return res.json({
+      res.json({
         message: "Login successful",
-        role: user.role,
       });
-
     } catch (err) {
       res.status(500).json({ message: "Login failed", error: err });
     }
@@ -176,37 +130,12 @@ export class AuthController {
     res.clearCookie("token");
     res.json({ message: "Logged out" });
   }
-
+  
   // GET /me
   static async me(req: AuthRequest, res: Response) {
     try {
       const userId = req.user.id;
-      const role = req.user.role;
 
-      // ADMIN CASE
-      if (role === "ADMIN") {
-        const admin = await prisma.admin.findUnique({
-          where: { id: userId },
-          select: {
-            id: true,
-            email: true,
-          },
-        });
-
-        if (!admin) {
-          return res.status(404).json({ message: "Admin not found" });
-        }
-
-        return res.json({
-          id: admin.id,
-          name: "Admin",
-          email: admin.email,
-          role: "ADMIN",
-          profile: null, // no profile
-        });
-      }
-
-      // STUDENT CASE
       const userWithProfile = await prisma.user.findUnique({
         where: { id: userId },
         select: {
@@ -229,8 +158,7 @@ export class AuthController {
         return res.status(404).json({ message: "User not found" });
       }
 
-      return res.json(userWithProfile);
-
+      res.json(userWithProfile);
     } catch (error) {
       console.error("ME ERROR:", error);
       res.status(500).json({ message: "Failed to fetch user" });
